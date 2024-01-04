@@ -1,7 +1,7 @@
-FROM ich777/debian-baseimage:bullseye_amd64
+FROM tux-box/ubuntu-baseimage:
 
-LABEL org.opencontainers.image.authors="admin@minenet.at"
-LABEL org.opencontainers.image.source="https://github.com/ich777/docker-steamcmd-server"
+LABEL org.opencontainers.image.authors="tux-box@github"
+LABEL org.opencontainers.image.source="https://github.com/tux-box/docker-steamcmd-ubuntu"
 
 RUN apt-get update && \
 	apt-get -y install --no-install-recommends lib32gcc-s1 lib32stdc++6 lib32z1 && \
