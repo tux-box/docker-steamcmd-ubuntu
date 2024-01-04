@@ -1,4 +1,4 @@
-FROM tux-box/ubuntu-baseimage:
+FROM tux-box/ubuntu-baseimage:latest
 
 LABEL org.opencontainers.image.authors="tux-box@github"
 LABEL org.opencontainers.image.source="https://github.com/tux-box/docker-steamcmd-ubuntu"
