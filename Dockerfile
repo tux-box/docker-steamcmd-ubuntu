@@ -24,7 +24,7 @@ ENV LANGUAGE='en_US:en'
 RUN ln -s /usr/games/steamcmd /usr/bin/steamcmd
 
 # Create a non-root user and group (e.g., 'steam')
-RUN useradd -m -g [steam] [steam]
+RUN useradd -ms /bin/bash steam
 
 # Set the working directory
 WORKDIR /home/steam
