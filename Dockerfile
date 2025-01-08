@@ -1,14 +1,7 @@
 ######## INSTALL ########
 
 # Set the base image
-FROM ubuntu:24.04
-
-# Set environment variables
-ENV USER root
-ENV HOME /root
-
-# Set working directory
-WORKDIR $HOME
+FROM ubuntu:latest
 
 # Insert Steam prompt answers
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
@@ -19,7 +12,7 @@ RUN echo steam steam/question select "I AGREE" | debconf-set-selections \
 ARG DEBIAN_FRONTEND=noninteractive
 RUN dpkg --add-architecture i386 \
  && apt-get update -y \
- && apt-get install -y --no-install-recommends ca-certificates locales steamcmd python3-pip python3-dev \
+ && apt-get install -y --no-install-recommends ca-certificates locales steamcmd \
  && rm -rf /var/lib/apt/lists/*
 
 # Add unicode support
@@ -35,9 +28,6 @@ RUN groupadd -r steam && useradd -r -g steam steam
 
 # Set the working directory
 WORKDIR /home/steam
-
-# Copy your application code into the container
-COPY . /home/steam
 
 # Change ownership of the files to the non-root user
 RUN chown -R steam:steam /home/steam
