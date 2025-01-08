@@ -1,7 +1,7 @@
 ######## INSTALL ########
 
 # Set the base image
-FROM ubuntu:latest
+FROM ubuntu:25.04
 
 # Insert Steam prompt answers
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
@@ -12,13 +12,13 @@ RUN echo steam steam/question select "I AGREE" | debconf-set-selections \
 ARG DEBIAN_FRONTEND=noninteractive
 RUN dpkg --add-architecture i386 \
  && apt-get update -y \
- && apt-get install -y --no-install-recommends ca-certificates locales steamcmd \
+ && apt-get install -y --no-install-recommends ca-certificates locales steamcmd git curl nano\
  && rm -rf /var/lib/apt/lists/*
 
 # Add unicode support
 RUN locale-gen en_US.UTF-8
-ENV LANG 'en_US.UTF-8'
-ENV LANGUAGE 'en_US:en'
+ENV LANG='en_US.UTF-8'
+ENV LANGUAGE='en_US:en'
 
 # Create symlink for executable
 RUN ln -s /usr/games/steamcmd /usr/bin/steamcmd
