@@ -1,37 +1,56 @@
-FROM tux-box/ubuntu-baseimage:latest
+######## INSTALL ########
 
-LABEL org.opencontainers.image.authors="tux-box@github"
-LABEL org.opencontainers.image.source="https://github.com/tux-box/docker-steamcmd-ubuntu"
+# Set the base image
+FROM ubuntu:24.04
 
-RUN apt-get update && \
-	apt-get -y install --no-install-recommends lib32gcc-s1 lib32stdc++6 lib32z1 && \
-	rm -rf /var/lib/apt/lists/*
+# Set environment variables
+ENV USER root
+ENV HOME /root
 
-ENV DATA_DIR="/serverdata"
-ENV STEAMCMD_DIR="${DATA_DIR}/steamcmd"
-ENV SERVER_DIR="${DATA_DIR}/serverfiles"
-ENV GAME_ID="template"
-ENV GAME_NAME="template"
-ENV GAME_PARAMS="template"
-ENV GAME_PORT=27015
-ENV VALIDATE=""
-ENV UMASK=000
-ENV UID=99
-ENV GID=100
-ENV USERNAME=""
-ENV PASSWRD=""
-ENV USER="steam"
-ENV DATA_PERM=770
+# Set working directory
+WORKDIR $HOME
 
-RUN mkdir $DATA_DIR && \
-	mkdir $STEAMCMD_DIR && \
-	mkdir $SERVER_DIR && \
-	useradd -d $DATA_DIR -s /bin/bash $USER && \
-	chown -R $USER $DATA_DIR && \
-	ulimit -n 2048
+# Insert Steam prompt answers
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+RUN echo steam steam/question select "I AGREE" | debconf-set-selections \
+ && echo steam steam/license note '' | debconf-set-selections
 
-ADD /scripts/ /opt/scripts/
-RUN chmod -R 770 /opt/scripts/
+# Update the repository and install SteamCMD
+ARG DEBIAN_FRONTEND=noninteractive
+RUN dpkg --add-architecture i386 \
+ && apt-get update -y \
+ && apt-get install -y --no-install-recommends ca-certificates locales steamcmd python3-pip python3-dev \
+ && rm -rf /var/lib/apt/lists/*
 
-#Server Start
-ENTRYPOINT ["/opt/scripts/start.sh"]
+# Add unicode support
+RUN locale-gen en_US.UTF-8
+ENV LANG 'en_US.UTF-8'
+ENV LANGUAGE 'en_US:en'
+
+# Create symlink for executable
+RUN ln -s /usr/games/steamcmd /usr/bin/steamcmd
+
+# Create a non-root user and group (e.g., 'appuser')
+RUN groupadd -r steam && useradd -r -g steam steam
+
+# Set the working directory
+WORKDIR /home/steam
+
+# Copy your application code into the container
+COPY . /home/steam
+
+# Change ownership of the files to the non-root user
+RUN chown -R steam:steam /home/steam
+
+# Switch to the non-root user
+USER steam
+
+# Update SteamCMD and verify latest version
+RUN steamcmd +quit
+
+# Fix missing directories and libraries
+RUN mkdir -p $HOME/.steam \
+ && ln -s $HOME/.local/share/Steam/steamcmd/linux32 $HOME/.steam/sdk32 \
+ && ln -s $HOME/.local/share/Steam/steamcmd/linux64 $HOME/.steam/sdk64 \
+ && ln -s $HOME/.steam/sdk32/steamclient.so $HOME/.steam/sdk32/steamservice.so \
+ && ln -s $HOME/.steam/sdk64/steamclient.so $HOME/.steam/sdk64/steamservice.so
