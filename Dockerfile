@@ -23,8 +23,8 @@ ENV LANGUAGE='en_US:en'
 # Create symlink for executable
 RUN ln -s /usr/games/steamcmd /usr/bin/steamcmd
 
-# Create a non-root user and group (e.g., 'appuser')
-RUN groupadd -r steam && useradd -r -g steam steam
+# Create a non-root user and group (e.g., 'steam')
+RUN useradd -m -g [steam] [steam]
 
 # Set the working directory
 WORKDIR /home/steam
