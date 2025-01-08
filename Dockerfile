@@ -29,9 +29,6 @@ RUN useradd -ms /bin/bash steam
 # Set the working directory
 WORKDIR /home/steam
 
-# Change ownership of the files to the non-root user
-RUN chown -R steam:steam /home/steam
-
 # Switch to the non-root user
 USER steam
 
